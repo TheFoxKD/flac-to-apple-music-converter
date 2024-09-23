@@ -27,3 +27,4 @@ var/
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/vcs.xml
 /app.log
+*log

@@ -1,3 +1,4 @@
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import List, Optional
 
@@ -5,7 +6,6 @@ from mutagen import File as MutagenFile
 from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
 from pydub import AudioSegment
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.utils.exceptions import ConversionError
 from src.utils.logging_config import get_logger
@@ -64,11 +64,13 @@ class AudioConverter:
             logger.error(f"Error converting {input_path}: {str(e)}")
             raise ConversionError(f"Failed to convert {input_path}: {str(e)}")
 
-    def convert_directory(self, input_dir: Path, output_dir: Optional[Path] = None) -> List[Path]:
+    def convert_directory(
+        self, input_dir: Path, output_dir: Optional[Path] = None
+    ) -> List[Path]:
         """
         Convert all FLAC files in a directory to the specified output format using parallel processing.
         """
-        flac_files = list(input_dir.glob('**/*.flac'))
+        flac_files = list(input_dir.glob("**/*.flac"))
         converted_files = []
 
         with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
@@ -76,7 +78,9 @@ class AudioConverter:
             for flac_file in flac_files:
                 if output_dir:
                     relative_path = flac_file.relative_to(input_dir)
-                    output_path = output_dir / relative_path.with_suffix(f'.{self.output_format}')
+                    output_path = output_dir / relative_path.with_suffix(
+                        f".{self.output_format}"
+                    )
                     output_path.parent.mkdir(parents=True, exist_ok=True)
                 else:
                     output_path = None
