@@ -5,6 +5,7 @@ from typing import List, Optional
 from mutagen import File as MutagenFile
 from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
+from mutagen.id3 import APIC, ID3
 from pydub import AudioSegment
 
 from src.utils.exceptions import ConversionError
@@ -34,6 +35,27 @@ class AudioConverter:
                 dest_audio[tag] = src_audio[tag]
 
         dest_audio.save()
+        self._copy_cover_art(src_path, dest_path)
+
+    def _copy_cover_art(self, src_path: Path, dest_path: Path) -> None:
+        """
+        Copy cover art from the source FLAC file to the destination file.
+        """
+        src_audio = FLAC(src_path)
+        dest_audio = ID3(dest_path)
+
+        for picture in src_audio.pictures:
+            dest_audio.add(
+                APIC(
+                    encoding=3,  # 3 is for utf-8
+                    mime=picture.mime,
+                    type=3,  # 3 is for the cover(front) image
+                    desc="Cover",
+                    data=picture.data,
+                )
+            )
+
+        dest_audio.save(v2_version=3)
 
     def convert_file(self, input_path: Path, output_path: Path) -> Path:
         """
