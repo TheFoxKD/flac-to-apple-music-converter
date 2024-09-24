@@ -8,6 +8,7 @@ from mutagen.flac import FLAC
 from mutagen.id3 import APIC, ID3
 from pydub import AudioSegment
 
+from src.utils.enums import AudioFormat
 from src.utils.exceptions import ConversionError
 from src.utils.logging_config import get_logger
 
@@ -21,7 +22,7 @@ class AudioConverter:
 
     def __init__(
         self,
-        output_format: str = "mp3",
+        output_format: AudioFormat = AudioFormat.MP3,
         num_threads: int = 4,
         include_cover: bool = True,
     ):
@@ -82,10 +83,10 @@ class AudioConverter:
         """
         try:
             if output_path is None:
-                output_path = input_path.with_suffix(f".{self.output_format}")
+                output_path = input_path.with_suffix(f".{self.output_format.value}")
 
             audio = AudioSegment.from_file(input_path, format="flac")
-            audio.export(output_path, format=self.output_format)
+            audio.export(output_path, format=self.output_format.value)
 
             self._copy_metadata(input_path, output_path)
 

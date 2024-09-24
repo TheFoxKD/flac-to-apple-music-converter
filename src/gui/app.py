@@ -4,6 +4,7 @@ from tkinter import filedialog
 
 from src.core.converter import AudioConverter
 from src.core.file_handler import FileHandler
+from src.utils.enums import AudioFormat
 from src.utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -16,7 +17,7 @@ class ConverterApp:
 
         self.input_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
-        self.output_format = tk.StringVar(value="mp3")
+        self.output_format = tk.StringVar(value=AudioFormat.MP3.value)
         self.include_cover_art = tk.BooleanVar(value=True)
 
         self.create_widgets()
@@ -44,9 +45,9 @@ class ConverterApp:
 
         # Output format selection
         tk.Label(self.master, text="Output Format:").grid(row=2, column=0, sticky="w")
-        tk.OptionMenu(self.master, self.output_format, "mp3", "aac", "alac").grid(
-            row=2, column=1, sticky="w"
-        )
+        tk.OptionMenu(
+            self.master, self.output_format, *[fmt.value for fmt in AudioFormat]
+        ).grid(row=2, column=1, sticky="w")
 
         # Checkbox for including cover art
         tk.Checkbutton(
@@ -67,7 +68,7 @@ class ConverterApp:
     def convert(self):
         input_path = Path(self.input_dir.get())
         output_path = Path(self.output_dir.get())
-        output_format = self.output_format.get()
+        output_format = AudioFormat(self.output_format.get())
         include_cover = self.include_cover_art.get()
 
         converter = AudioConverter(
