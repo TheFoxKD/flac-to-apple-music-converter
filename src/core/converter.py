@@ -1,6 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from mutagen import File as MutagenFile
 from mutagen.easyid3 import EasyID3
@@ -97,12 +97,24 @@ class AudioConverter:
             raise ConversionError(f"Failed to convert {input_path}: {str(e)}")
 
     def convert_directory(
-        self, input_dir: Path, output_dir: Optional[Path] = None
+        self,
+        input_dir: Path,
+        output_dir: Optional[Path] = None,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
     ) -> List[Path]:
         """
         Convert all FLAC files in a directory to the specified output format using parallel processing.
+
+        Args:
+            input_dir (Path): Input directory containing FLAC files.
+            output_dir (Optional[Path]): Output directory for converted files.
+            progress_callback (Optional[Callable[[int, int], None]]): Callback function to report progress.
+
+        Returns:
+            List[Path]: List of paths to converted files.
         """
         flac_files = list(input_dir.glob("**/*.flac"))
+        total_files = len(flac_files)
         converted_files = []
 
         with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
@@ -111,21 +123,26 @@ class AudioConverter:
                 if output_dir:
                     relative_path = flac_file.relative_to(input_dir)
                     output_path = output_dir / relative_path.with_suffix(
-                        f".{self.output_format}"
+                        f".{self.output_format.value}"
                     )
-                    output_path.parent.mkdir(parents=True, exist_ok=True)
                 else:
-                    output_path = None
+                    output_path = flac_file.with_suffix(f".{self.output_format.value}")
+
+                # Создаём директорию для выходного файла
+                output_path.parent.mkdir(parents=True, exist_ok=True)
 
                 future = executor.submit(self.convert_file, flac_file, output_path)
                 future_to_file[future] = flac_file
 
-            for future in as_completed(future_to_file):
+            for i, future in enumerate(as_completed(future_to_file)):
                 flac_file = future_to_file[future]
                 try:
                     converted_file = future.result()
                     converted_files.append(converted_file)
                 except ConversionError as e:
                     logger.warning(f"Skipping file due to conversion error: {str(e)}")
+
+                if progress_callback:
+                    progress_callback(i + 1, total_files)
 
         return converted_files
