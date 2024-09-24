@@ -6,6 +6,7 @@ from mutagen import File as MutagenFile
 from mutagen.easyid3 import EasyID3
 from mutagen.flac import FLAC
 from mutagen.id3 import APIC, ID3
+from mutagen.mp4 import MP4
 from pydub import AudioSegment
 
 from src.utils.enums import AudioFormat
@@ -73,6 +74,28 @@ class SingleFileConverter:
                 )
             )
         dest_audio.save(v2_version=3)
+
+    @staticmethod
+    def has_cover(audio_file: Path) -> bool:
+        """Check if the audio file has a cover."""
+        try:
+            audio = MutagenFile(audio_file)
+            if isinstance(audio, FLAC):
+                return bool(audio.pictures)
+            elif isinstance(audio, MP4):
+                return "covr" in audio
+            elif isinstance(audio, ID3):
+                return any(tag.startswith("APIC:") for tag in audio.keys())
+            else:
+                # Попробуем загрузить как ID3 напрямую
+                try:
+                    id3 = ID3(audio_file)
+                    return any(tag.startswith("APIC:") for tag in id3.keys())
+                except:
+                    pass
+        except Exception as e:
+            logger.error(f"Error checking cover for {audio_file}: {str(e)}")
+        return False
 
 
 class AudioConverter:

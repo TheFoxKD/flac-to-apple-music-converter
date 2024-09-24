@@ -1,15 +1,17 @@
 # FLAC to Apple Music Compatible Format Converter
 
-This project is a Python-based tool for converting FLAC audio files to formats compatible with Apple Music, such as MP3,
-AAC, or ALAC. It provides both a command-line interface and a graphical user interface for ease of use.
+This project is a Python-based tool for converting FLAC audio files to formats compatible with Apple Music, such as MP3.
+It provides both a command-line interface and a graphical user interface for ease of use.
 
 ## Features
 
-- Convert FLAC files to MP3, AAC, or ALAC formats
+- Convert FLAC files to MP3
 - Batch conversion of entire directories
 - Graphical user interface for easy file and format selection
-- Logging for both audit and diagnostic purposes
-- Error handling and reporting
+- Preserve metadata and album artwork during conversion
+- Multi-threaded processing for faster conversions
+- Comprehensive logging for both audit and diagnostic purposes
+- Robust error handling and reporting
 
 ## Installation
 
@@ -20,6 +22,11 @@ AAC, or ALAC. It provides both a command-line interface and a graphical user int
    ```
 
 ## Prerequisites
+
+- Python 3.7+
+- FFmpeg
+
+### Installing FFmpeg
 
 This project requires FFmpeg to be installed on your system. You can install it using the following methods:
 
@@ -36,7 +43,13 @@ PATH. You can verify the installation by running `ffmpeg -version` in your termi
 
 ## Usage
 
-Run the application by executing:
+Run the application with the graphical user interface:
+
+```bash
+make run
+```
+
+or
 
 ```bash
 python main.py
@@ -63,7 +76,6 @@ This command will discover and run all the tests in the tests directory using th
     - `utils/`: Utility modules for logging and custom exceptions
     - `gui/`: Graphical user interface implementation
 - `tests/`: Unit tests for core functionality
-- `config/`: Configuration files
 - `main.py`: Entry point of the application
 
 ## Contributing

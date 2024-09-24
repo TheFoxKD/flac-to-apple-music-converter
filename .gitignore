@@ -28,3 +28,4 @@ var/
 /.idea/vcs.xml
 /app.log
 *log
+*.DS_Store
