@@ -19,9 +19,15 @@ class AudioConverter:
     A class for converting FLAC files to other audio formats.
     """
 
-    def __init__(self, output_format: str = "mp3", num_threads: int = 4):
+    def __init__(
+        self,
+        output_format: str = "mp3",
+        num_threads: int = 4,
+        include_cover: bool = True,
+    ):
         self.output_format = output_format
         self.num_threads = num_threads
+        self.include_cover = include_cover
 
     def _copy_metadata(self, src_path: Path, dest_path: Path) -> None:
         """
@@ -35,7 +41,10 @@ class AudioConverter:
                 dest_audio[tag] = src_audio[tag]
 
         dest_audio.save()
-        self._copy_cover_art(src_path, dest_path)
+
+        # Копируем обложку, если пользователь выбрал эту опцию
+        if self.include_cover:
+            self._copy_cover_art(src_path, dest_path)
 
     def _copy_cover_art(self, src_path: Path, dest_path: Path) -> None:
         """

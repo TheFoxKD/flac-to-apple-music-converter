@@ -17,6 +17,7 @@ class ConverterApp:
         self.input_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
         self.output_format = tk.StringVar(value="mp3")
+        self.include_cover_art = tk.BooleanVar(value=True)
 
         self.create_widgets()
 
@@ -47,9 +48,14 @@ class ConverterApp:
             row=2, column=1, sticky="w"
         )
 
+        # Checkbox for including cover art
+        tk.Checkbutton(
+            self.master, text="Include cover art", variable=self.include_cover_art
+        ).grid(row=3, column=0, sticky="w")
+
         # Convert button
         tk.Button(self.master, text="Convert", command=self.convert).grid(
-            row=3, column=1
+            row=4, column=1
         )
 
     def browse_input(self):
@@ -62,8 +68,11 @@ class ConverterApp:
         input_path = Path(self.input_dir.get())
         output_path = Path(self.output_dir.get())
         output_format = self.output_format.get()
+        include_cover = self.include_cover_art.get()
 
-        converter = AudioConverter(output_format)
+        converter = AudioConverter(
+            output_format, num_threads=4, include_cover=include_cover
+        )
         file_handler = FileHandler()
 
         try:
