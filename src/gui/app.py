@@ -33,7 +33,39 @@ class ConverterApp:
         self.conversion_thread: Optional[Thread] = None
         self.widgets: dict = {}
 
+        self.create_menu()
         self.create_widgets()
+
+    def create_menu(self) -> None:
+        """Create the application menu bar."""
+        menu_bar = tk.Menu(self.master)
+        self.master.config(menu=menu_bar)
+
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Select Input Directory", command=self.browse_input)
+        file_menu.add_command(
+            label="Select Output Directory", command=self.browse_output
+        )
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.master.quit)
+
+        options_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Options", menu=options_menu)
+        options_menu.add_checkbutton(
+            label="Include Cover Art", variable=self.include_cover_art
+        )
+
+        format_menu = tk.Menu(options_menu, tearoff=0)
+        options_menu.add_cascade(label="Output Format", menu=format_menu)
+        for fmt in AudioFormat:
+            format_menu.add_radiobutton(
+                label=fmt.value, variable=self.output_format, value=fmt.value
+            )
+
+        help_menu = tk.Menu(menu_bar, tearoff=0)
+        menu_bar.add_cascade(label="Help", menu=help_menu)
+        help_menu.add_command(label="About", command=self.show_about)
 
     def create_widgets(self) -> None:
         """Create and layout all widgets for the application."""
@@ -205,3 +237,13 @@ class ConverterApp:
             total (int): Total number of files to process.
         """
         self.master.after(0, lambda: self.update_progress(current, total))
+
+    def show_about(self) -> None:
+        """Display the About dialog."""
+        messagebox.showinfo(
+            "About",
+            "FLAC to Apple Music Converter\n\n"
+            "A simple tool to convert FLAC files to Apple Music compatible formats.\n\n"
+            "Version: 1.0\n"
+            "Author: Denis (TheFoxKD) Krishtopa\n",
+        )
