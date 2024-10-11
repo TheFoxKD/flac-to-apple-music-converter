@@ -3,6 +3,10 @@
 This project is a Python-based tool for converting FLAC audio files to formats compatible with Apple Music, such as MP3.
 It provides both a command-line interface and a graphical user interface for ease of use.
 
+<p align="center">
+   <img width="792" alt="Снимок экрана 2024-10-11 в 20 24 35" src="https://github.com/user-attachments/assets/7276bd36-a889-4e16-97c7-26d9a8a93dd4">
+</p>
+
 ## Features
 
 - Convert FLAC files to MP3
